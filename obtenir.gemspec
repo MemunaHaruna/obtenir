@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["memuna.haruna@andela.com"]
 
   spec.summary       = "Simple github api consumer"
-  spec.description   = "query github api and save response to file or database"
+  spec.description   = "query github api with their username and save response to file or database"
   spec.homepage      = "https://github.com/MemunaHaruna/obtenir"
   spec.license       = "MIT"
 

@@ -6,7 +6,7 @@ require_relative './obtenir/services/file_operations'
 
 module Obtenir
   class Obtenir
-    def get_github_user
+    def self.get_github_user
       print "Please enter a valid github username: ".colorize(:yellow)
       username = gets.strip
       response = APIRequest::GithubAPIRequest.fetch(username)
@@ -14,7 +14,7 @@ module Obtenir
       process(response)
     end
 
-    def process(response)
+    def self.process(response)
       puts "Would you like to save the response?(y/n): ".colorize(:yellow)
       reply = gets.downcase.strip
       return if reply == 'n'
@@ -23,7 +23,7 @@ module Obtenir
       save_github_user(gets.strip.to_i, response)
     end
 
-    def save_github_user(decision, response)
+    def self.save_github_user(decision, response)
       case decision
         when 1 then FileOperations::Document.new(response).save
         when 2 then Database::MongoDB.new(response).save
@@ -36,5 +36,5 @@ module Obtenir
 end
 
 
-Obtenir::Obtenir.new.get_github_user
+# Obtenir::Obtenir.get_github_user
 
