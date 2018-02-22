@@ -9,3 +9,5 @@ gem 'httparty'
 gem 'mongo', '~> 2.2'
 
 gem 'bson_ext'
+
+gem 'colorize'

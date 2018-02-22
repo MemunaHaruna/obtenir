@@ -1,73 +1,40 @@
-# require "obtenir/version"
-require 'httparty'
-require 'mongo'
+require_relative "./obtenir/version"
+require 'colorize'
+require_relative './obtenir/services/api_request'
+require_relative './obtenir/services/database'
+require_relative './obtenir/services/file_operations'
 
 module Obtenir
-  class APIQuery
-    def get_username
-      print "Please enter a github username: "
+  class Obtenir
+    def get_github_user
+      print "Please enter a valid github username: ".colorize(:yellow)
       username = gets.strip
-
-      @response = HTTParty.get("https://api.github.com/users/#{username}")
-      query(@response)
+      response = APIRequest::GithubAPIRequest.fetch(username)
+      return "Invalid username".colorize(:red) if response.message == 'Not Found'
+      process(response)
     end
 
-    def query(response)
-      if response.message == 'Not Found'
-        puts "invalid username"
-        return get_username
-      end
-      print "Would you like to save the response?(y/n): "
+    def process(response)
+      puts "Would you like to save the response?(y/n): ".colorize(:yellow)
       reply = gets.downcase.strip
-      if reply == 'n'
-        return
-      end
-      process
+      return if reply == 'n'
+      puts "Where would you like to save this response?".colorize(:yellow)
+      puts "1. A File or 2. A Database".colorize(:yellow)
+      save_github_user(gets.strip.to_i, response)
     end
 
-    def process
-      puts "Where would you like to save this response?"
-      puts "1. A File"
-      puts "2. A Database"
-      result = gets.strip.to_i
-      case result
-        when 1 then FileDocument.new(@response).save
-        when 2 then DB.new(@response).save
+    def save_github_user(decision, response)
+      case decision
+        when 1 then FileOperations::Document.new(response).save
+        when 2 then Database::DB.new(response).save
         else
-          return "Invalid input"
+          puts "Invalid input".colorize(:red)
       end
     end
   end
 
-  class FileDocument
-    def initialize(response)
-      @response = response
-    end
-
-    def save
-      f = File.new(File.join(Dir.pwd,'lib/obtenir/assets','user_details.rb'), "w")
-      f.write(@response)
-      f.close
-    end
-  end
-
-  class DB
-    def initialize(response)
-      @response = response
-    end
-
-    def save
-      puts "Start a mongodb instance by running *mongod* or *sudo mongod*"
-      puts "please enter database name: "
-      database = gets.strip.downcase
-      client = Mongo::Client.new([ '127.0.0.1:27017' ], :database => database)
-      collection = client[:people]
-      result = collection.insert_one(@response)
-      puts result.n
-    end
-  end
 end
 
 
-Obtenir::APIQuery.new.get_username
+Obtenir::Obtenir.new.get_github_user
 
