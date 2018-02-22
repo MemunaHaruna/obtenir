@@ -26,7 +26,7 @@ module Obtenir
     def save_github_user(decision, response)
       case decision
         when 1 then FileOperations::Document.new(response).save
-        when 2 then Database::DB.new(response).save
+        when 2 then Database::MongoDB.new(response).save
         else
           puts "Invalid input".colorize(:red)
       end

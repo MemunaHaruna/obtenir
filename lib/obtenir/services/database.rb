@@ -2,7 +2,7 @@ require 'mongo'
 require 'colorize'
 
 module Database
-  class DB
+  class MongoDB
     def initialize(response)
       @response = response
     end
