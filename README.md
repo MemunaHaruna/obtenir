@@ -23,9 +23,8 @@ Or install it yourself as:
 
 * To use Obtenir, run:
 ```ruby
-Obtenir::Obtenir.get_github_user
+require 'obtenir'
 ```
-
 
 ## Development
 
