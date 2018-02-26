@@ -6,6 +6,6 @@ RSpec.describe Obtenir do
   end
 
   it "does something useful" do
-    expect(false).to eq(true)
+    expect(Obtenir::Obtenir.new.get_github_user).to eq(nil)
   end
 end

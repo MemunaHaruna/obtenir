@@ -1,7 +1,7 @@
 require 'httparty'
 
-module APIRequest
-  class GithubAPIRequest
+module Obtenir
+  class APIRequest
     def self.fetch(username)
       HTTParty.get("https://api.github.com/users/#{username}")
     end

@@ -1,40 +1,11 @@
 require_relative "./obtenir/version"
 require 'colorize'
-require_relative './obtenir/services/api_request'
-require_relative './obtenir/services/database'
-require_relative './obtenir/services/file_operations'
+require_relative './obtenir/api_request'
+require_relative './obtenir/database'
+require_relative './obtenir/file_operations'
+require_relative './obtenir/application'
 
 module Obtenir
-  class Obtenir
-    def self.get_github_user
-      print "Please enter a valid github username: ".colorize(:yellow)
-      username = gets.strip
-      response = APIRequest::GithubAPIRequest.fetch(username)
-      return "Invalid username".colorize(:red) if response.message == 'Not Found'
-      process(response)
-    end
-
-    def self.process(response)
-      puts "Would you like to save the response?(y/n): ".colorize(:yellow)
-      reply = gets.downcase.strip
-      return if reply == 'n'
-      puts "Where would you like to save this response?".colorize(:yellow)
-      puts "1. A File or 2. A Database".colorize(:yellow)
-      save_github_user(gets.strip.to_i, response)
-    end
-
-    def self.save_github_user(decision, response)
-      case decision
-        when 1 then FileOperations::Document.new(response).save
-        when 2 then Database::MongoDB.new(response).save
-        else
-          puts "Invalid input".colorize(:red)
-      end
-    end
-  end
-
+  application = Application.new
+  application.get_username
 end
-
-
-# Obtenir::Obtenir.get_github_user
-
