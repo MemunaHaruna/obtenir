@@ -1,53 +1,47 @@
 module Obtenir
   class Application
-    def get_username
-      print "Please enter a valid github username: ".colorize(:yellow)
-      @username = gets.strip
-      get_user_details
+    def get_input(message)
+      puts message.colorize(:yellow)
+      input = gets.downcase.strip
+      Exit.exit if input == ('0' || 'n')
+      input
     end
 
-    def get_user_details
-      @response = APIRequest.fetch(@username)
-      get_username if @response.message == 'Not Found'
-      process_response
+    def fetch_user(username)
+      puts "Fetching #{username}'s details from github..."
+      APIRequest.fetch(username)
     end
 
-    def process_response
-      puts "Would you like to save the response?(y/n): ".colorize(:yellow)
-      reply = gets.downcase.strip
-      return if reply == 'n'
-      puts "Where would you like to save this response?".colorize(:yellow)
-      puts "Enter [1] for File, [2] for Database and any other character to exit".colorize(:yellow)
-      decision = gets.strip.to_i
-      save_github_user(decision)
+    def process
+      message = "Not Found"
+      while message == "Not Found" do
+        @response = fetch_user(get_input("Please enter a valid github username or 0 to exit:"))
+        message = @response.message
+      end
+      get_input("Would you like to save the response?(y/n):")
+      decision = get_input("Where would you like to save this response?
+      Enter [1] for File, [2] for Database and [0] to exit")
+      save(decision)
     end
 
-    def save_github_user(decision)
+    def save(decision)
       case decision
-        when 1 then save_to_file
-        when 2 then save_to_database
+        when "1" then save_to_file
+        when "2" then save_to_database
         else
-          puts "Goodbye!".colorize(:red)
+          Exit.exit("Oops... invalid entry. Please, try again")
       end
     end
 
     def save_to_file
-      puts "Please provide the absolute path to the file where the response will be saved".colorize(:yellow)
-      file_path = gets.strip
-      if FileOperations.new(file_path, @response).save?
-        puts "Response saved successfully. You can view it here: #{file_path}".colorize(:green)
-      else
-        puts "Directory does not exist".colorize(:red)
-      end
+      file_path = get_input("Enter the absolute path to the file: ")
+      FileOperations.new(file_path, @response).save
     end
 
     def save_to_database
       puts "Before you proceed, start a mongodb instance by running *mongod* or *sudo mongod* in another terminal".colorize(:red)
-      puts "please enter mongodb database name: ".colorize(:yellow)
-      database = gets.strip.downcase
-      if Database.new(database, @response).save?
-        puts "Response saved in database: #{database.capitalize} successfully.".colorize(:green)
-      end
+      database = get_input("Kindly enter a Mongodb database name:")
+      Database.new(database, @response).save
     end
   end
 
